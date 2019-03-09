@@ -1,0 +1,17 @@
+*.class
+*.log
+.gradle/
+.settings/
+bin/
+.classpath
+.project
+.gradle/
+gradlew.*
+gradlew
+build/
+node_modules/
+src-gen/
+srcMore/
+*.idea
+sites/
+settings.gradle
