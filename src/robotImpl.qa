@@ -12,51 +12,108 @@ Dispatch stopCmd: stopCmd							// R-stopExplore
 Dispatch backHomeCmd: backHomeCmd					// R-backHome
 Dispatch continueExploreCmd: continueExploreCmd		// R-continueExplore
 
+Dispatch bag: bag(X) 
+
 /* Console command */
-Dispatch alert: alert								// R-alert
+Dispatch alert: alert														// R-alert
 Dispatch bombInBag: bombInBag(X)
 
-Dispatch robotState: robotState(X)					//
-Dispatch robotBackHome: robotBackHome				// R-BackHome
+Dispatch robotState: robotState(X)											//
+Dispatch robotBackHome: robotBackHome										// R-BackHome
 
 Context ctxRobotImpl ip [ host='localhost' port=8079 ]
 
-QActor robotdiscovery context ctxRobotImpl {
+QActor robotretrieval context ctxRobotImpl {
 	
-	/* Rating initial condition  */
+	/* Rating initial condition (enviromentCondition)  */
 	State home initial [
 		
 	] transition
-		stopAfter 60000
-		whenMsg [ !? environment ]  exploreCmd -> exploration						// R-explore
+		stopAfter 10000
+		whenMsg continueExploreCmd -> continueExplore											// R-reachBag
 	
-	/*
-	 * -----------------------------------------------------------------------------
-	 * Exploration business logic
-	 * -----------------------------------------------------------------------------
-	 */
-	State exploration [
-		// ACTION: start blinking													// R-blinkLed
-		// ACTION: explore the environment
+	/* Business Logic */
+	State continueExplore [
+		// reach bomb and return at home										// R-reachBag & R-bagAtHome
 	] transition
-		stopAfter 60000
-		whenMsg stopCmd -> idle													// R-stopExplore
+		stopAfter 10000
+		whenMsg robotBackHome -> home
+}
+
+QActor robotdiscovery context ctxRobotImpl {
+	
+	/* Rating initial condition (enviromentCondition)  */
+	State home initial [
+		
+	] transition
+		stopAfter 10000
+		whenMsg [ !? environment ]  exploreCmd -> exploration				// R-explore
+	
+	/* Business Logic */
+	State exploration [
+		// explore the environment
+	] transition
+		stopAfter 10000
+		whenMsg stopCmd -> idle												// R-stopExplore
 	
 		State idle [
-		// ACTION: halt
-		// ACTION: stop blinking													// R-blinkLed (stop)
+		// halt and evaluate environment
 	] transition
-		stopAfter 60000
-		whenMsg exploreCmd -> exploration,											// R-continueExplore
-		whenMsg backHomeCmd -> home													// R-backHome
+		stopAfter 10000
+		whenMsg exploreCmd -> exploration,									// R-continueExplore
+		whenMsg backHomeCmd -> home											// R-backHome
 		
 	State handleBag [
-		// ACTION: halt																// R-stopAtBag
-		// ACTION: stop blinking													
-		// ACTION: take picture														// R-takePhoto
-		//forward console -m bombInBag: bag(X)										// R-sendPhoto
+		// halt near the bag and 											// R-stopAtBag
+		// take picture														// R-takePhoto
+		forward console -m bombInBag: bag(X)								// R-sendPhoto
 	] transition
-		stopAfter 60000
+		stopAfter 10000
 		whenMsg backHomeCmd -> home,
 		whenMsg exploreCmd -> exploration
+}
+
+QActor console context ctxRobotImpl {
+	
+	State handleWork initial [
+		
+	] transition
+		stopAfter 10000
+		whenMsg robotState -> updateView,											// R-consoleUpdate
+		whenMsg bombInBag -> handlePhoto
+		finally repeatPlan
+	
+	State handlePhoto [
+		onMsg bag: bag(X) -> selfMsg bombInBag: bombInBag(false) // ACTION: evaluate bomb
+	] transition
+		whenTime 3000 -> handlePhoto
+		whenMsg bombInBag -> handleBagStatus
+	
+	State handleBagStatus [
+		onMsg bombInBag: bombInBag(true) -> {
+			// store a photo												// R-storePhoto
+			forward robotdiscovery -m backHomeCmd: backHomeCmd;							// R-backHomeSinceBomb
+			selfMsg alert: alert													// R-alert
+		};
+		onMsg bombInBag: isBomb(false) ->
+			forward robotdiscovery -m exploreCmd: exploreCmd						// R-continueExploreAfterPhoto
+	] transition
+		whenTime 3000 -> handleWork
+		whenMsg alert -> handleAlert
+	
+	State handleAlert [
+		
+	] transition
+		whenTime 3000 -> handleAlert
+		//whenMsg robotHome -> retrieveBomb											// R-whaitForHome													
+	
+	State retrieveBomb [
+		forward robotretrieval -m continueExploreCmd: continueExploreCmd						// R-reachBag
+	] transition
+		whenTime 100 -> handleWork
+	
+	State updateView resumeLastPlan [
+		onMsg robotState: state(X) -> printCurrentMessage
+	]
+	
 }
