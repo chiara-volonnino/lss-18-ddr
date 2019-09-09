@@ -2,12 +2,12 @@
 /*
 This code is generated only ONCE
 */
-package it.unibo.console;
+package it.unibo.world_observer;
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.qactors.QActorContext;
 
-public class Console extends AbstractConsole { 
-	public Console(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
+public class World_observer extends AbstractWorld_observer { 
+	public World_observer(String actorId, QActorContext myCtx, IOutputEnvView outEnvView )  throws Exception{
 		super(actorId, myCtx, outEnvView);
 	}
 /*
