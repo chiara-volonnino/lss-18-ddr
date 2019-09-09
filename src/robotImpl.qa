@@ -1,119 +1,221 @@
 System robotImpl
 
 /* Environment control  */
-Dispatch environment: environment					// R-startExplore
+Event environment: environment(X)												// environment(X = ok or not ok)
+Event temperature: temperature(X)												// temperature(X = temperaturValue)
 
-/* Temperature control event */
-Event temperature: temp(X)							// R-tempOk
+/* Robot-Mind */
+Dispatch exploreCmd: exploreCmd						
+Dispatch stopCmd: stopCmd							
+Dispatch backHomeCmd: backHomeCmd					
+Dispatch reachBagCmd: reachBagCmd	
 
-/* Robot command */
-Dispatch exploreCmd: exploreCmd						// R-explore
-Dispatch stopCmd: stopCmd							// R-stopExplore
-Dispatch backHomeCmd: backHomeCmd					// R-backHome
-Dispatch continueExploreCmd: continueExploreCmd		// R-continueExplore
+Dispatch bag: bag(bagPhoto(X)) 													// bagPhoto(X = photo)
+Dispatch handleBag: handleBag(X)												//handle(X = action)
 
-Dispatch bag: bag(X) 
+Dispatch robotState: robotState(position(X,Y))
+Dispatch robotHome: robotHome
+Dispatch robotNearBag: robotNearBag
+
+/* Robot-Actuator */
+Dispatch robotAdapterAdd: addAdapter(T,A)										// addAdapter(T=type, A=args)			
+Event robotCmd: robotCmd(X)														// robotCmd(X = robot-mind command)
+
+Event robotSonar: robotSonar(distance(X))										// distance(X = distanceValue)
+Event robotObstacle: robotObstacole(X)											// robotObstacle(X = obstacle)
 
 /* Console command */
-Dispatch alert: alert														// R-alert
+Event userCmd: userCmd(X)														// userCommand(X = user command)
+Dispatch alert: alert											
 Dispatch bombInBag: bombInBag(X)
-
-Dispatch robotState: robotState(X)											//
-Dispatch robotBackHome: robotBackHome										// R-BackHome
+							
 
 Context ctxRobotImpl ip [ host='localhost' port=8079 ]
 
-QActor robotretrieval context ctxRobotImpl {
-	
-	/* Rating initial condition (enviromentCondition)  */
-	State home initial [
-		
-	] transition
-		stopAfter 10000
-		whenMsg continueExploreCmd -> continueExplore											// R-reachBag
-	
-	/* Business Logic */
-	State continueExplore [
-		// reach bomb and return at home										// R-reachBag & R-bagAtHome
-	] transition
-		stopAfter 10000
-		whenMsg robotBackHome -> home
-}
-
-QActor robotdiscovery context ctxRobotImpl {
-	
-	/* Rating initial condition (enviromentCondition)  */
-	State home initial [
-		
-	] transition
-		stopAfter 10000
-		whenMsg [ !? environment ]  exploreCmd -> exploration				// R-explore
-	
-	/* Business Logic */
-	State exploration [
-		// explore the environment
-	] transition
-		stopAfter 10000
-		whenMsg stopCmd -> idle												// R-stopExplore
-	
-		State idle [
-		// halt and evaluate environment
-	] transition
-		stopAfter 10000
-		whenMsg exploreCmd -> exploration,									// R-continueExplore
-		whenMsg backHomeCmd -> home											// R-backHome
-		
-	State handleBag [
-		// halt near the bag and 											// R-stopAtBag
-		// take picture														// R-takePhoto
-		forward console -m bombInBag: bag(X)								// R-sendPhoto
-	] transition
-		stopAfter 10000
-		whenMsg backHomeCmd -> home,
-		whenMsg exploreCmd -> exploration
-}
-
 QActor console context ctxRobotImpl {
 	
-	State handleWork initial [
+State init initial [
+		println("Console init ")
+	] transition
+		whenTime 200 -> work
+	
+	State work [
 		
 	] transition
-		stopAfter 10000
-		whenMsg robotState -> updateView,											// R-consoleUpdate
-		whenMsg bombInBag -> handlePhoto
+		stopAfter 60000
+		whenEvent userCmd -> sendCommand,
+		whenEvent robotState -> updateView,											// R-consoleUpdate
+		whenMsg bag -> takePhoto
 		finally repeatPlan
 	
-	State handlePhoto [
-		onMsg bag: bag(X) -> selfMsg bombInBag: bombInBag(false) // ACTION: evaluate bomb
-	] transition
-		whenTime 3000 -> handlePhoto
-		whenMsg bombInBag -> handleBagStatus
+	State sendCommand resumeLastPlan [
+		printCurrentEvent;
+		onEvent userCmd: userCmd(robotgui(cmd(explore))) -> forward mindrobotdiscovery -m exploreCmd: exploreCmd;
+		onEvent userCmd: userCmd(robotgui(cmd(halt))) -> forward mindrobotdiscovery -m stopCmd: stopCmd;
+		onEvent userCmd: userCmd(robotgui(cmd(home))) -> forward mindrobotdiscovery -m backHomeCmd: backHomeCmd;
+		onEvent userCmd: userCmd(robotgui(bagStatus(bomb))) -> selfMsg bombInBag: bombInBag(bomb, args(bagPhoto(nothing)));
+		onEvent userCmd: userCmd(robotgui(bagStatus(bag))) -> selfMsg bombInBag: bombInBag(bag, args(nothing))
+	]
 	
-	State handleBagStatus [
-		onMsg bombInBag: bombInBag(true) -> {
-			// store a photo												// R-storePhoto
-			forward robotdiscovery -m backHomeCmd: backHomeCmd;							// R-backHomeSinceBomb
+	State takePhoto [
+		onMsg bag: bag(picture(X)) -> printCurrentMessage
+	] transition
+		whenTime 3000 -> takePhoto
+		whenMsg bombInBag -> bagStatus,
+		whenEvent userCmd -> sendCommand
+		finally repeatPlan
+	
+	State bagStatus [
+		onMsg bombInBag: bagStatus(bomb, args(bagPhoto(X))) -> {
+			// R-storePhoto
+			forward mindrobotdiscovery -m backHomeCmd: backHomeCmd;					// R-backHomeSinceBomb
 			selfMsg alert: alert													// R-alert
 		};
-		onMsg bombInBag: isBomb(false) ->
-			forward robotdiscovery -m exploreCmd: exploreCmd						// R-continueExploreAfterPhoto
+		onMsg bombInBag: bombInBag(bag, Y) ->
+			forward mindrobotdiscovery -m exploreCmd: exploreCmd					// R-continueExploreAfterPhoto
 	] transition
-		whenTime 3000 -> handleWork
+		whenTime 3000 -> work
 		whenMsg alert -> handleAlert
 	
 	State handleAlert [
 		
 	] transition
 		whenTime 3000 -> handleAlert
-		//whenMsg robotHome -> retrieveBomb											// R-whaitForHome													
-	
-	State retrieveBomb [
-		forward robotretrieval -m continueExploreCmd: continueExploreCmd						// R-reachBag
-	] transition
-		whenTime 100 -> handleWork
+		whenMsg robotHome: robotHome do
+			forward mindrobotretrieval -m reachBagCmd: reachBagCmd				// R-whaitForHome & R-reachBag
 	
 	State updateView resumeLastPlan [
-		onMsg robotState: state(X) -> printCurrentMessage
+		onMsg robotState: state(X) -> printCurrentEvent
 	]
+}
+
+QActor worldobserver context ctxRobotImpl {
 	
+	Rules {
+		temperature(20).
+		evaluateTemp :- temperature(X), eval(lt, X, 25).							// R-TempOk
+		evaluateEnvironment :- evaluateTemp.
+	}
+	
+	State doObserve initial [
+		[ !? evaluateEnvironment ] emit environment: environment(ok)
+			else emit environment: environment(notok)
+	] transition
+		whenTime 2000 -> doObserve
+		whenEvent temperature: temperature(X) do
+			ReplaceRule temperature(Y) with temperature(X)							// R-TempOk
+		finally repeatPlan
+}
+
+QActor mindrobotdiscovery context ctxRobotImpl {
+	
+	/* Rating initial condition (enviromentCondition)  */
+	State home initial [
+		onMsg robotHome: robotHome ->  forward console -m robotHome: robotHome
+	] transition
+		stopAfter 10000
+		whenEvent environment: enviroment(Y) do demo replaceRule(environment(X), environment(Y)),
+		whenMsg [ !? environment(ok) ]  exploreCmd -> initExploring											// R-explore
+		finally repeatPlan
+	
+	/* Business Logic */
+	State initExploring [
+		forward robotactuator -m robotCmd: robotCmd(blinkStart)				// R-blink
+	] transition
+		whenTime 200 -> exploring
+	
+	State exploring [
+		println("Require robot start EXPLOREING ");
+		emit robotCmd: robotCmd(w)
+	] transition 
+		stopAfter 10000
+		whenMsg stopCmd -> initIdle,										// R-stopExplore
+		whenMsg robotNearBag -> initHandleBag
+		
+	State initIdle [
+		forward robotactuator -m robotCmd: robotCmd(stopBlink)				
+	] transition 
+		whenTime 200 -> idle
+		
+	State idle [
+		// halt and evaluate environment
+	] transition
+		stopAfter 10000
+		whenMsg exploreCmd -> exploring,									// R-continueExplore
+		whenMsg backHomeCmd -> home											// R-backHome
+		
+	State initHandleBag  [
+		selfMsg handleBag: handleBag(halt);									// R-stopAtBag
+		selfMsg handleBag: handleBag(takePhoto)								// R-takePhoto
+	] transition 
+		whenTime 20 -> handleBag
+	
+	State handleBag [												
+		println("Robot HANDLING AT BAG ");
+		onMsg handleBag: handleBag(halt) -> { 
+			emit robotCmd: robotCmd(h); 
+			emit robotCmd: robotCmd(blinkStop)
+		};
+		onMsg handleBag: handleBag(takePhoto) -> {
+			println("Robot TAKE A PHOTO ");
+			forward console -m bag: bag(bagPhoto(X))
+		}
+	] transition
+		whenTime 200 -> handleBag
+		whenMsg handleBag -> handleBag,
+		whenMsg backHomeCmd -> home,
+		whenMsg exploreCmd -> initExploring
+}
+
+QActor robotactuator context ctxRobotImpl {
+
+	Rules {
+//		robotType("robotSerial", setuparg("/dev/ttyACM0")).
+//		robotType("robotSerial", setuparg("/dev/rfcomm0")).
+//		robotType("robotVirtual", setuparg("localhost,true")).
+		robotType("robotVirtual", setuparg("localhost,false")).
+	}
+	
+	State init initial [
+		println("Robot actuator START")
+	] transition
+		whenTime 100 -> initRobots
+	
+	State initRobots [
+		[ ?? robotType(T, setuparg(A))] selfMsg robotAdapterAdd: addAdapter(T,A)
+	] transition
+		whenTime 5000 -> doWork
+		whenMsg robotAdapterAdd: addAdapter(T,A) do javaRun it.unibo.robotadapter.allRobots.setUp(T,A)
+		finally repeatPlan
+	
+	State doWork [
+		
+	] transition
+		stopAfter 60000
+		whenEvent robotCmd -> executeCommand
+		finally repeatPlan
+	
+	State executeCommand resumeLastPlan [
+		onEvent robotCmd: cmd(X) -> javaRun it.unibo.robotadapter.allRobots.doMove(X)
+	]
+}
+
+QActor mindrobotretrieval context ctxRobotImpl {
+	
+	/* Rating initial condition (enviromentCondition)  */
+	State home initial [
+		
+	] transition
+		stopAfter 10000
+		whenEvent environment: environment(E) do
+			demo replaceRule(environment(X), environment(E)),
+		whenMsg [ !? environment(ok) ] reachBagCmd -> reachBag					// R-reachBag
+		finally repeatPlan
+	
+	/* Business Logic */
+	State reachBag [
+		println("Robot retrieval REACH BAG ")								   // R-reachBag & R-bagAtHome
+	] transition
+		stopAfter 10000
+		whenMsg robotHome -> home
 }
