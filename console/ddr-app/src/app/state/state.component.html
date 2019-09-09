@@ -1,0 +1,22 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Console</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <p>
+      Robot current state: {{state.name}}
+    </p>
+    <div *ngIf="state.message != undefined">
+      <img *ngIf="messageIsPicture()" [src]="'data:image/jpg;base64,'+parseMessageAsPicture()"
+        data-err-src="images/png/avatar.png" class="col-md-12"/>
+      <div *ngIf="messageIsText()" class="{{getMessageColorClass()}}">{{state.message}}</div>
+    </div>
+  </mat-card-content>
+  <mat-card-actions  class="actions-row">
+    <button mat-stroked-button *ngFor="let action of state.actions"
+      color="{{getColor(action)}}"
+      (click)="execute(action)">
+      <b>{{action.name}}</b>
+    </button>
+  </mat-card-actions>
+</mat-card>

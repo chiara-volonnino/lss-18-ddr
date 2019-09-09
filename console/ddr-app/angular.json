@@ -3,17 +3,21 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "ddr-app": {
+    "robot-frontend": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
       "prefix": "app",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "styleext": "scss"
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/ddr-app",
+            "outputPath": "dist/robot-frontend",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -23,7 +27,8 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "src/styles.scss"
             ],
             "scripts": []
           },
@@ -57,18 +62,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "ddr-app:build"
+            "browserTarget": "robot-frontend:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "ddr-app:build:production"
+              "browserTarget": "robot-frontend:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "ddr-app:build"
+            "browserTarget": "robot-frontend:build"
           }
         },
         "test": {
@@ -79,7 +84,8 @@
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
             "styles": [
-              "src/styles.css"
+              "./node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "src/styles.scss"
             ],
             "scripts": [],
             "assets": [
@@ -102,7 +108,7 @@
         }
       }
     },
-    "ddr-app-e2e": {
+    "robot-frontend-e2e": {
       "root": "e2e/",
       "projectType": "application",
       "prefix": "",
@@ -111,11 +117,11 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "ddr-app:serve"
+            "devServerTarget": "robot-frontend:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "ddr-app:serve:production"
+              "devServerTarget": "robot-frontend:serve:production"
             }
           }
         },
@@ -131,5 +137,5 @@
       }
     }
   },
-  "defaultProject": "ddr-app"
+  "defaultProject": "robot-frontend"
 }

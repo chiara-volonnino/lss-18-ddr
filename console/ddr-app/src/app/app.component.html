@@ -1,47 +1,38 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-:center">
-  <h1>
-      Robot Control Page
-  </h1>
+<div class="mat-typography app-frame mat-app-background">
+  <main>
+    <!-- ROBOT -->
+    <mat-toolbar color="primary">
+      <mat-toolbar-row>
+        <span>Robot console page</span>
+      </mat-toolbar-row>
+    </mat-toolbar>
+
+    <div class="d-flex flex-wrap justify-content-around align-content-around">
+      <mat-card class="col-md-12">
+        <mat-card-header>
+          <mat-card-title>Set temperature</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <app-temperature></app-temperature>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="col-md-6 col-sm-12">
+        <mat-card-header>
+          <mat-card-title>World</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <app-world></app-world>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="col-md-5 col-sm-12">
+        <mat-card-header>
+          <mat-card-title>System configuratioln</mat-card-title>
+        </mat-card-header>
+        <mat-card-content class="d-flex flex-wrap flex-column justify-content-around align-content-around">
+          <app-robot class="col-md-12"></app-robot>
+          <app-state class="col-md-12"></app-state>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </main>
 </div>
-
-<div [ngStyle]="{'background-color':'lightyellow'}" 
-  style="border-style: solid;;height: 140px;" 
-  id="side">
-  <h3>Information</h3>
-  <script>
-      angular.module('textInputExample', [])
-        .controller('ExampleController', ['$scope', function($scope) {
-          $scope.example = {
-            text: '',
-            word: /^\s*\w*\s*$/
-          };
-        }]);
-    </script>
-    <form name="myForm" ng-controller="ExampleController">
-      <label>Temperature:
-        <input type="text" name="input" ng-model="example.text"
-               ng-pattern="example.word" required ng-trim="false">
-      </label>
-    </form>
-  <p>Sonar info:
-</div>
-
-<div [ngStyle]="{'background-color':'lightgreen'}" 
-  style="border-style: solid;height: 140px;"
-  id="side">
-  <h3>Application robot control</h3>
-  <button mat-button>EXPLORE</button>
-  <p></p>
-  <button mat-button>HALT</button>
-</div>
-
-<p>
-<div [ngStyle]="{'background-color':''}" 
-  style="border-style: solid; height: 329px;"
-  id="middle">
-  <h3>Map</h3>
-</div>
-
-
-<router-outlet></router-outlet>
