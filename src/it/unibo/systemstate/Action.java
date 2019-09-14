@@ -1,11 +1,11 @@
 package it.unibo.systemstate;
 
 public class Action {
-	
+
 	private String name;
 	private String type;
 	private String cmd;
-	
+
 	public Action() {
 		super();
 		this.name = null;
@@ -43,5 +43,5 @@ public class Action {
 	public void setCmd(String cmd) {
 		this.cmd = cmd;
 	}
-	
+
 }

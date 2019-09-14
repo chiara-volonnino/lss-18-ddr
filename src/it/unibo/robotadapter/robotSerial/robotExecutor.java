@@ -14,11 +14,12 @@ public class robotExecutor implements RobotExecutor {
 		if (robotSupport == null) {
 			robotSupport = new RobotSerialCommunication(port, new RobotSerialCommunication.Logger() {
 				private String owner = "";
+
 				@Override
 				public void setOwner(String owner) {
 					this.owner = owner + " ";
 				}
-				
+
 				@Override
 				public void log(String msg) {
 					qa.println(owner + msg);
@@ -41,7 +42,7 @@ public class robotExecutor implements RobotExecutor {
 			});
 		}
 	}
-	
+
 	@Override
 	public void terminate(QActor qa) {
 		robotSupport.close();
@@ -49,22 +50,22 @@ public class robotExecutor implements RobotExecutor {
 
 	@Override
 	public void doMove(QActor qa, String cmd) {
-		switch(cmd) {
-			case "h":
-			case "w":
-			case "a":
-			case "s":
-			case "d":
-				robotSupport.executeTheCommand(cmd);
-				break;
-			case "blinkStart":
-				robotSupport.executeTheCommand("b");
-				break;
-			case "blinkStop":
-				robotSupport.executeTheCommand("n");
-				break;
-			default:
-				// todo
+		switch (cmd) {
+		case "h":
+		case "w":
+		case "a":
+		case "s":
+		case "d":
+			robotSupport.executeTheCommand(cmd);
+			break;
+		case "blinkStart":
+			robotSupport.executeTheCommand("b");
+			break;
+		case "blinkStop":
+			robotSupport.executeTheCommand("n");
+			break;
+		default:
+			// todo
 		}
 	}
 }

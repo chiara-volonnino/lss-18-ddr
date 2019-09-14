@@ -107,7 +107,7 @@ public class robotExecutor implements RobotExecutor {
 			// todo
 		}
 	}
-	
+
 	private interface Logger {
 		void line(String s);
 	}

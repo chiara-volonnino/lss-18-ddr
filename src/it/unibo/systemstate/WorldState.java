@@ -1,16 +1,16 @@
 package it.unibo.systemstate;
 
 public class WorldState {
-	
+
 	private String temperature;
 	private String[][] map;
-	
+
 	public WorldState() {
 		super();
 		this.temperature = null;
 		this.map = null;
 	}
-	
+
 	public WorldState(String temperature, String[][] map) {
 		super();
 		this.temperature = temperature;

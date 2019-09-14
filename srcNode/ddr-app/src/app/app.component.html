@@ -1,6 +1,6 @@
 <div class="mat-typography app-frame mat-app-background">
   <main>
-    <!-- ROBOT -->
+    
     <mat-toolbar color="primary">
       <mat-toolbar-row>
         <span>Robot console page</span>
@@ -8,29 +8,20 @@
     </mat-toolbar>
 
     <div class="d-flex flex-wrap justify-content-around align-content-around">
-      <mat-card class="col-md-12">
-        <mat-card-header>
-          <mat-card-title>Set temperature</mat-card-title>
-        </mat-card-header>
+      <mat-card class="col-md-6 col-sm-12">
+        <mat-card-content class="d-flex flex-wrap flex-column justify-content-around align-content-around">
+          <app-robot class="col-md-12"></app-robot>
+          <app-state class="col-md-12"></app-state>
+        </mat-card-content>
+      </mat-card>
+      <mat-card class="col-md-6 col-sm-12">
         <mat-card-content>
           <app-temperature></app-temperature>
         </mat-card-content>
       </mat-card>
       <mat-card class="col-md-6 col-sm-12">
-        <mat-card-header>
-          <mat-card-title>World</mat-card-title>
-        </mat-card-header>
         <mat-card-content>
           <app-world></app-world>
-        </mat-card-content>
-      </mat-card>
-      <mat-card class="col-md-5 col-sm-12">
-        <mat-card-header>
-          <mat-card-title>System configuratioln</mat-card-title>
-        </mat-card-header>
-        <mat-card-content class="d-flex flex-wrap flex-column justify-content-around align-content-around">
-          <app-robot class="col-md-12"></app-robot>
-          <app-state class="col-md-12"></app-state>
         </mat-card-content>
       </mat-card>
     </div>

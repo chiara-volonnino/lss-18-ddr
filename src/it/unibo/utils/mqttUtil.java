@@ -22,7 +22,7 @@ public class mqttUtil {
 	private static final String BROKER = "tcp://192.168.137.2:1883";
 
 	private static HashMap<String, MqttClient> connections = new HashMap<>();
-	
+
 	private static void connect(QActor qa) {
 		MemoryPersistence persistence = new MemoryPersistence();
 		try {
@@ -37,7 +37,7 @@ public class mqttUtil {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static void subscribe(QActor qa, String topic) {
 		try {
 			MqttClient sampleClient = connections.get(qa.getName());

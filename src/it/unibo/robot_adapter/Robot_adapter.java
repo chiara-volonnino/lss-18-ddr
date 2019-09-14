@@ -2,13 +2,13 @@
 /*
 This code is generated only ONCE
 */
-package it.unibo.console;
+package it.unibo.robot_adapter;
 
 import it.unibo.is.interfaces.IOutputEnvView;
 import it.unibo.qactors.QActorContext;
 
-public class Console extends AbstractConsole {
-	public Console(String actorId, QActorContext myCtx, IOutputEnvView outEnvView) throws Exception {
+public class Robot_adapter extends AbstractRobot_adapter {
+	public Robot_adapter(String actorId, QActorContext myCtx, IOutputEnvView outEnvView) throws Exception {
 		super(actorId, myCtx, outEnvView);
 	}
 
@@ -17,7 +17,7 @@ public class Console extends AbstractConsole {
 	 */
 	@Override
 	public void aroundPostStop() {
-		it.unibo.utils.mqttUtil.disconnect(this);
+		it.unibo.robotadapter.allRobots.terminate(this);
 		super.aroundPostStop();
 	}
 }

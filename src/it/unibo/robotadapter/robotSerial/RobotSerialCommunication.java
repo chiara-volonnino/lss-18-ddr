@@ -33,7 +33,7 @@ public class RobotSerialCommunication {
 			logger.log("ERROR " + e.getMessage());
 		}
 	}
-	
+
 	public void close() {
 		this.logger.log("closing communication on port " + port);
 		try {
@@ -84,9 +84,10 @@ public class RobotSerialCommunication {
 			}
 		}.start();
 	}
-	
+
 	public interface Logger {
 		void setOwner(String owner);
+
 		void log(String msg);
 	}
 }
