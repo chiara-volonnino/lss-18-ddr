@@ -2,29 +2,12 @@ System robot
 
 /*
  * ---------------------------------------------------------------------------------
- * Environment requirements
+ * Environment
  * ---------------------------------------------------------------------------------
  */
-Event environment: environment(X)													// X= ok|not
-Event temperature: temperature(X)													// X = temperature (°c)
+Event environment: environment(X)													// X=ok|notok
 
-/*
- * ---------------------------------------------------------------------------------
- * Console
- * ---------------------------------------------------------------------------------
- */
-Dispatch alert: alert
-Dispatch bagStatus: bagStatus(X)													// X = bomb|bag
-Dispatch stateUpdate: state(T, P)													// T = type ; P = payload ; T = temperature | map | robotMovement | robotState 
-Dispatch map: map(M)																// M: map (json)
-
-/*
- * ---------------------------------------------------------------------------------
- * View
- * ---------------------------------------------------------------------------------
- */
-Event frontendUserCmd: frontendUserCmd(X)											//from GUI to CONSOLE;  X=command
-Event frontendRobotState: frontendRobotState(X)										//from CONSOLE to GUI;  X=state
+Event temperature: temperature(X)													// X = temperature (c)
 
 /*
  * ---------------------------------------------------------------------------------
@@ -32,7 +15,8 @@ Event frontendRobotState: frontendRobotState(X)										//from CONSOLE to GUI; 
  * ---------------------------------------------------------------------------------
  */
 Dispatch robotAdapterAdd: robot(T,A)												// T=Type ; A=args
-Dispatch robotAdapterCmd: robotCmd(M,T)												//M=w|a|s|d|h  T:(duration)
+Dispatch robotAdapterCmd: robotCmd(M,T)												//M=w|a|s|d|h  T:(int) duration
+
 Dispatch robotCmd: robotCmd(M)														//M=w|a|s|d|h
 
 /*
@@ -43,33 +27,29 @@ Dispatch robotCmd: robotCmd(M)														//M=w|a|s|d|h
 Dispatch collisionDispatch: obstacle(TARGET)
 Dispatch obstacleNear: obstacleNear
 Dispatch moveMsgCmd: moveMsgCmd(TF)  
-Dispatch moveMsgCmdDone: moveMsgCmdDone(X) 
-Dispatch moveMsgCmdObstacle: moveMsgCmdObstacle(X)
+Dispatch moveMsgCmdDone: moveMsgCmdDone(X) //X=cmd  
+Dispatch moveMsgCmdObstacle: moveMsgCmdObstacle(X) //X=
 
 /*
  * ---------------------------------------------------------------------------------
  * Robot-advanced
  * ---------------------------------------------------------------------------------
  */
-Dispatch waitMoveCompleted: waitMoveCompleted
+Dispatch waitMoveCompleted   : waitMoveCompleted
 
 /*
  * ---------------------------------------------------------------------------------
  * Planner
  * ---------------------------------------------------------------------------------
  */
-Dispatch endAction: endAction 
+Dispatch endAction     : endAction 
 
 /*
- * ---------------------------------------------------------------------------------
- * Robot position, crew and robot capacity
- * ---------------------------------------------------------------------------------
+ * Robot position
  */
 Event robotSonar: robotSonar(distance(X))											// X = distance
 Event robotSonarObstacle: obstacle(X)												// From robot virtual sonar obstacle; X = name
-// Event robotSonarWall: sonar(SONAR, TARGET, DISTANCE)								// From real robot (physical sonar)
-Dispatch robotHome: robotHome
-Dispatch robotHomeAfterBomb: robotHomeAfterBomb
+// Event robotSonarWall: sonar(SONAR, TARGET, DISTANCE)								// sonar fisico
 
 /*
  * ---------------------------------------------------------------------------------
@@ -81,31 +61,48 @@ Dispatch cmdGoHome: cmdGoHome
 Dispatch cmdExplore: cmdExplore
 Dispatch cmdReachBomb: cmdReachBomb
 
-Dispatch handleBag: handleBag(X)
+Dispatch handleBag: handleBag(X)													// handling bag logic; X = action 
 Dispatch bag: bag(picture(X))														// X=photo
 
 Dispatch idleWhileRetrieving: idleWhileRetrieving
 Dispatch idleWhileReturning: idleWhileReturning
 
+/*
+ * Robot position
+ */
+Dispatch robotHome: robotHome
+Dispatch robotHomeAfterBomb: robotHomeAfterBomb
+
+/*
+ * ---------------------------------------------------------------------------------
+ * Console
+ * ---------------------------------------------------------------------------------
+ */
+Dispatch alert: alert
+Dispatch bagStatus: bagStatus(X)													// X = bomb|bag
+Dispatch stateUpdate: state(T, P)													// T = type ; P = payload ; T = temperature | map | robotMovement | robotState 
+Dispatch map: map(M)																// M: map (json)
+
+// GUI
+Event frontendUserCmd: frontendUserCmd(X)											//from GUI to CONSOLE;  X=command
+Event frontendRobotState: frontendRobotState(X)										//from CONSOLE to GUI;  X=state
 
 //pubSubServer "tcp://broker.hivemq.com:1883"
-
 
 Context ctxConsole ip [ host="192.168.137.1" port=8078 ]
 
 Context ctxRobot ip [ host="192.168.137.2" port=8079 ]
 
-//EventHandler 
+// Handler sonar virtuale
+EventHandler collisionevh for robotSonarObstacle -print  {   
+ 	forwardEvent onecellforward -m collisionDispatch
+};
 
-/*
- * --------------------------------------------------------------------------------
- * Robot.observer implementation
- * --------------------------------------------------------------------------------
- */
 QActor world_observer context ctxConsole {
+	
 	Rules {
 		// Impostazioni default:
-		temperature(20).
+		temperature(18).
 		// Regole di valutazione:
 		evaluateTemp :- temperature(X), eval(lt, X, 25).							// R-TempOk
 		// Regola di valutazione complessiva:
@@ -113,7 +110,7 @@ QActor world_observer context ctxConsole {
 	}
 	
 	Plan init normal [
-	//		connectAsSubscriber "unibo/environment"
+//		connectAsSubscriber "unibo/environment"
 		javaRun it.unibo.utils.mqttUtil.connectAndSubscribe("unibo/environment")
 	] switchTo doObserve
 	
@@ -133,98 +130,10 @@ QActor world_observer context ctxConsole {
 	] switchTo doObserve
 }
 
-/*
- * --------------------------------------------------------------------------------
- * Console implementation
- * --------------------------------------------------------------------------------
- */
-QActor console context ctxConsole {
-	Plan init normal [
-		delay 2000;
-//		connectAsSubscriber "unibo/frontendUserCmd";
-		javaRun it.unibo.utils.mqttUtil.connectAndSubscribe("unibo/frontendUserCmd");
-		println("Console initialize")
-	] switchTo doWork
-	
-	Plan doWork [
-		
-	] transition
-		stopAfter 6000000
-		whenEvent frontendUserCmd -> adaptCommand,
-		whenEvent environment -> storeEnvironment,
-		whenMsg stateUpdate -> updateView,											// R-consoleUpdate
-		whenMsg bag -> handlePhoto
-		finally repeatPlan
-	
-	Plan adaptCommand resumeLastPlan [
-		printCurrentEvent;
-		onEvent frontendUserCmd: frontendUserCmd(cmd(explore)) -> forward robot_discovery_mind -m cmdExplore: cmdExplore;
-		onEvent frontendUserCmd: frontendUserCmd(cmd(retrieve)) -> forward robot_retriever_mind -m cmdReachBomb: cmdReachBomb;
-		onEvent frontendUserCmd: frontendUserCmd(cmd(halt)) -> forward robot_discovery_mind -m cmdStop: cmdStop;
-		onEvent frontendUserCmd: frontendUserCmd(cmd(home)) -> forward robot_discovery_mind -m cmdGoHome: cmdGoHome;
-		onEvent frontendUserCmd: frontendUserCmd(bagStatus(bomb)) -> selfMsg bagStatus: bagStatus(bomb);
-		onEvent frontendUserCmd: frontendUserCmd(bagStatus(bag)) -> selfMsg bagStatus: bagStatus(bag)
-	]
-	
-	Plan storeEnvironment resumeLastPlan [
-		onEvent environment: environment(notok) ->
-			selfMsg stateUpdate: state(messageDanger, "Temperature too high!");
-		onEvent environment: environment(ok) ->
-			selfMsg stateUpdate: state(messageInfo, "Environment condition is's OK.")
-	]
-	
-	Plan handlePhoto [
-		onMsg bag: bag(picture(X)) -> selfMsg stateUpdate: state(picture, X);
-		onMsg bag: bag(picture(X)) -> ReplaceRule picture(_) with picture(X)
-	] transition
-		stopAfter 6000000
-		whenMsg stateUpdate -> updateView,
-		whenMsg bagStatus -> handleBagStatus,
-		whenEvent frontendUserCmd -> adaptCommand
-		finally repeatPlan
-	
-	Plan handleBagStatus [
-		onMsg bagStatus: bagStatus(bomb) -> {
-			[ !? picture(X) ] javaRun it.unibo.utils.photoUtil.storePhoto(X);		// R-storePhoto
-			forward robot_discovery_mind -m cmdGoHome: cmdGoHome;					// R-backHomeSinceBomb
-			selfMsg alert: alert													// R-alert
-		};
-		onMsg bagStatus: bagStatus(bag) ->
-			forward robot_discovery_mind -m cmdExplore: cmdExplore					// R-continueExploreAfterPhoto
-	] transition
-		whenTime 3000 -> doWork
-		whenMsg alert -> handleAlert
-	
-	Plan handleAlert [
-		
-	] transition
-		stopAfter 6000000
-		whenMsg robotHome -> startRetrieval,										// R-whaitForHome & R-reachBag
-		whenMsg stateUpdate -> updateView
-		finally repeatPlan
-	
-	Plan startRetrieval [
-		// Send map
-		javaRun it.unibo.utils.updateStateOnRobot.sendMap();
-     	javaRun it.unibo.utils.updateStateOnConsole.updateRobotState("retriever-home")
-	] transition
-		whenTime 1000 -> doWork
-	
-	Plan updateView resumeLastPlan [
-		onMsg stateUpdate: state(T,P) -> javaRun it.unibo.utils.updateStateOnConsole.receivedUpdateState(T,P)
-	]
-}
-
-
-/*
- * --------------------------------------------------------------------------------
- * Robot-adapter implementation
- * --------------------------------------------------------------------------------
- */
 QActor robot_adapter context ctxRobot {
 
 	Rules {
-//		robotType("robotSerial", setuparg("/dev/ttyACM0")).
+		robotType("robotSerial", setuparg("/dev/ttyACM0")).
 //		robotType("robotSerial", setuparg("/dev/rfcomm0")).
 		robotType("robotVirtual", setuparg("localhost,true")).
 //		robotType("robotVirtual", setuparg("localhost,false")).
@@ -232,7 +141,7 @@ QActor robot_adapter context ctxRobot {
 	}
 	
 	Plan init normal [
-		println("Robot adapter initilize")
+		println("Robot adapter init")
 	] transition
 		whenTime 100 -> initRobots
 	
@@ -258,9 +167,9 @@ QActor robot_adapter context ctxRobot {
 }
 
 /*
- * --------------------------------------------------------------------------------
- * Moves the robot ahead of one cell
- * --------------------------------------------------------------------------------
+ * ----------------------------------------------------------
+ * onecellforward : moves the robot ahead of one cell
+ * ----------------------------------------------------------
  */
 QActor onecellforward context ctxRobot {
 	
@@ -328,13 +237,7 @@ QActor onecellforward context ctxRobot {
 	Plan handleError[ println("onecellforward ERROR") ]
 }
 
-
-/*
- * --------------------------------------------------------------------------------
- * Robot-planner implementation
- * --------------------------------------------------------------------------------
- */
-QActor robot_advanced context ctxRobot {
+QActor robot_planner context ctxRobot {
 	
 	Rules {
 		timew(1500).
@@ -388,11 +291,6 @@ QActor robot_advanced context ctxRobot {
 
 }
 
-/*
- * --------------------------------------------------------------------------------
- * Mind - Robot-discovery implementation
- * --------------------------------------------------------------------------------
- */
 QActor robot_discovery_mind context ctxRobot {
 	
 	Rules {
@@ -541,7 +439,7 @@ QActor robot_discovery_mind context ctxRobot {
 		[ !? move(M) ] println( doActions_doingTheMove(M) );
 		[ not !? move(M) ] selfMsg endAction : endAction ;
      	[ !? move(M) ] selfMsg waitMoveCompleted: waitMoveCompleted;
-     	[ !? doTheMove(M) ] forward robot_advanced -m robotCmd: robotCmd(M)
+     	[ !? doTheMove(M) ] forward robot_planner -m robotCmd: robotCmd(M)
 	] transition
 		stopAfter 6000000
 		whenMsg cmdStop -> goToIdle,   //first to be checked
@@ -616,11 +514,6 @@ QActor robot_discovery_mind context ctxRobot {
 	Plan handleError[ println("mind ERROR") ]
 }
 
-/*
- * --------------------------------------------------------------------------------
- * Mind - Robot-retriever implementation
- * --------------------------------------------------------------------------------
- */
 QActor robot_retriever_mind context ctxRobot {
 	
 	Rules {
@@ -731,15 +624,13 @@ QActor robot_retriever_mind context ctxRobot {
 		whenMsg cmdGoHome -> goToHome												// R-backHome
 	
 	/*
-	 * -----------------------------------------------------------------------------
-	 * Planner
-	 * -----------------------------------------------------------------------------
+	 * PLANNER
 	 */
 	Plan doActions[
 		[ !? move(M) ] println( doActions_doingTheMove(M) );
 		[ not !? move(M) ] selfMsg endAction : endAction ;
      	[ !? move(M) ] selfMsg waitMoveCompleted: waitMoveCompleted;
-     	[ !? doTheMove(M) ] forward robot_advanced -m robotCmd: robotCmd(M)
+     	[ !? doTheMove(M) ] forward robot_planner -m robotCmd: robotCmd(M)
 	] transition
 		stopAfter 6000000
 		whenMsg cmdStop -> goToIdle,   //first to be checked
@@ -789,5 +680,85 @@ QActor robot_retriever_mind context ctxRobot {
 		println("STATE[terminate] retriever home!");
      	javaRun it.unibo.utils.updateStateOnConsole.updateRobotState("terminating")
 	]
+
 	Plan handleError[ println("mind ERROR") ]
+
+}
+
+QActor console context ctxConsole {
+	
+	Plan init normal [
+		delay 2000;
+//		connectAsSubscriber "unibo/frontendUserCmd";
+		javaRun it.unibo.utils.mqttUtil.connectAndSubscribe("unibo/frontendUserCmd");
+		println("Console init")
+	] switchTo doWork
+	
+	Plan doWork [
+		
+	] transition
+		stopAfter 6000000
+		whenEvent frontendUserCmd -> adaptCommand,
+		whenEvent environment -> storeEnvironment,
+		whenMsg stateUpdate -> updateView,											// R-consoleUpdate
+		whenMsg bag -> handlePhoto
+		finally repeatPlan
+	
+	Plan adaptCommand resumeLastPlan [
+		printCurrentEvent;
+		onEvent frontendUserCmd: frontendUserCmd(cmd(explore)) -> forward robot_discovery_mind -m cmdExplore: cmdExplore;
+		onEvent frontendUserCmd: frontendUserCmd(cmd(retrieve)) -> forward robot_retriever_mind -m cmdReachBomb: cmdReachBomb;
+		onEvent frontendUserCmd: frontendUserCmd(cmd(halt)) -> forward robot_discovery_mind -m cmdStop: cmdStop;
+		onEvent frontendUserCmd: frontendUserCmd(cmd(home)) -> forward robot_discovery_mind -m cmdGoHome: cmdGoHome;
+		onEvent frontendUserCmd: frontendUserCmd(bagStatus(bomb)) -> selfMsg bagStatus: bagStatus(bomb);
+		onEvent frontendUserCmd: frontendUserCmd(bagStatus(bag)) -> selfMsg bagStatus: bagStatus(bag)
+	]
+	
+	Plan storeEnvironment resumeLastPlan [
+		onEvent environment: environment(notok) ->
+			selfMsg stateUpdate: state(messageDanger, "Environment adverse - temperature too hot!");
+		onEvent environment: environment(ok) ->
+			selfMsg stateUpdate: state(messageInfo, "Environment condition is safe.")
+	]
+	
+	Plan handlePhoto [
+		onMsg bag: bag(picture(X)) -> selfMsg stateUpdate: state(picture, X);
+		onMsg bag: bag(picture(X)) -> ReplaceRule picture(_) with picture(X)
+	] transition
+		stopAfter 6000000
+		whenMsg stateUpdate -> updateView,
+		whenMsg bagStatus -> handleBagStatus,
+		whenEvent frontendUserCmd -> adaptCommand
+		finally repeatPlan
+	
+	Plan handleBagStatus [
+		onMsg bagStatus: bagStatus(bomb) -> {
+			[ !? picture(X) ] javaRun it.unibo.utils.photoUtil.storePhoto(X);		// R-storePhoto
+			forward robot_discovery_mind -m cmdGoHome: cmdGoHome;					// R-backHomeSinceBomb
+			selfMsg alert: alert													// R-alert
+		};
+		onMsg bagStatus: bagStatus(bag) ->
+			forward robot_discovery_mind -m cmdExplore: cmdExplore					// R-continueExploreAfterPhoto
+	] transition
+		whenTime 3000 -> doWork
+		whenMsg alert -> handleAlert
+	
+	Plan handleAlert [
+		
+	] transition
+		stopAfter 6000000
+		whenMsg robotHome -> startRetrieval,										// R-whaitForHome & R-reachBag
+		whenMsg stateUpdate -> updateView
+		finally repeatPlan
+	
+	Plan startRetrieval [
+		// Send map
+		javaRun it.unibo.utils.updateStateOnRobot.sendMap();
+     	javaRun it.unibo.utils.updateStateOnConsole.updateRobotState("retriever-home")
+	] transition
+		whenTime 1000 -> doWork
+	
+	Plan updateView resumeLastPlan [
+		onMsg stateUpdate: state(T,P) -> javaRun it.unibo.utils.updateStateOnConsole.receivedUpdateState(T,P)
+	]
 }
