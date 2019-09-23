@@ -3,7 +3,7 @@ const portNumber = readPortNumberFromArguments();
 const server = require('./express/index');
 server.config();
 
-server.app.use(server.express.static(__dirname + '/dist/robot-frontend'));
+server.app.use(server.express.static(__dirname + '/dist/ddr-app'));
 server.app.get('/*', (req, res) => res.sendFile(server.path.join(__dirname)));
 
 server.launch(portNumber);

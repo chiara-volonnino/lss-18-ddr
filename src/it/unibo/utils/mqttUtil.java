@@ -16,6 +16,11 @@ import alice.tuprolog.Term;
 import it.unibo.qactors.QActorUtils;
 import it.unibo.qactors.akka.QActor;
 
+/**
+ * 
+ * @author eugenio pierfederici
+ *
+ */
 public class mqttUtil {
 
 //	private static final String BROKER = "tcp://broker.hivemq.com:1883";

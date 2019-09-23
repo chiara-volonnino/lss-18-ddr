@@ -1,4 +1,4 @@
-# RobotFrontend
+# Robot Console
 
 Questo progetto contiene sia il frontend lato client (sviluppato in Angular, se ne può fare il deploy in maniera autonoma seguento le indicazioni in **ANGULAR**), sia il backend (sviluppato in Express); quest'ultimo ci consente anche di effettuare il deploy di angular stesso.
 

@@ -102,7 +102,7 @@ QActor world_observer context ctxConsole {
 	
 	Rules {
 		// Impostazioni default:
-		temperature(18).
+		temperature(20).
 		// Regole di valutazione:
 		evaluateTemp :- temperature(X), eval(lt, X, 25).							// R-TempOk
 		// Regola di valutazione complessiva:
@@ -133,8 +133,8 @@ QActor world_observer context ctxConsole {
 QActor robot_adapter context ctxRobot {
 
 	Rules {
-		robotType("robotSerial", setuparg("/dev/ttyACM0")).
-//		robotType("robotSerial", setuparg("/dev/rfcomm0")).
+//		robotType("robotSerial", setuparg("/dev/ttyACM0")).
+		robotType("robotSerial", setuparg("/dev/rfcomm0")).
 		robotType("robotVirtual", setuparg("localhost,true")).
 //		robotType("robotVirtual", setuparg("localhost,false")).
 //		robotType("robotDemo", setuparg("")).
