@@ -8,8 +8,8 @@
 #include "SerialTask.h"
 
 
-#define PROXIMITY_TRIG_PIN 12
-#define PROXIMITY_ECHO_PIN 11
+#define PROXIMITY_TRIG_PIN A5
+#define PROXIMITY_ECHO_PIN A4
 #define LED_PIN    13
 
 /*
