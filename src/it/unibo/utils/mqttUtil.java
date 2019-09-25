@@ -23,8 +23,8 @@ import it.unibo.qactors.akka.QActor;
  */
 public class mqttUtil {
 
-//	private static final String BROKER = "tcp://broker.hivemq.com:1883";
-	private static final String BROKER = "tcp://192.168.1.8:1883";
+	private static final String BROKER = "tcp://broker.hivemq.com:1883";
+//	private static final String BROKER = "tcp://192.168.1.8:1883";
 
 	private static HashMap<String, MqttClient> connections = new HashMap<>();
 
