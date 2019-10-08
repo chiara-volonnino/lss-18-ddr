@@ -16,15 +16,19 @@ public class allRobots {
 
 	public static void setUp(QActor qa, String robotType, String args) {
 		try {
+			qa.println("in setUp section, all robot-robot adapter. Robot type is: " + robotType);
 			RobotExecutor tmp = null;
 			switch (robotType) {
 			case ROBOT_SERIAL:
+				qa.println("init serial configuration");
 				tmp = new it.unibo.robotadapter.robotSerial.robotExecutor();
 				break;
 			case ROBOT_DEMO:
+				qa.println("init demo configuration");
 				tmp = new it.unibo.robotadapter.robotDemo.robotExecutor();
 				break;
 			case ROBOT_VIRTUAL:
+				qa.println("init virtual configuration");
 				tmp = new it.unibo.robotadapter.robotVirtual.robotExecutor();
 				break;
 			}
@@ -43,7 +47,6 @@ public class allRobots {
 	}
 
 	public static void terminate(QActor qa) {
-		// Termina gli executor e li rimuove
 		qa.println("allRobots terminating");
 		for (String key : executors.keySet()) {
 			for (int i = executors.get(key).size() - 1; i >= 0; i--) {

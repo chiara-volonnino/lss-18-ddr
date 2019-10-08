@@ -1,10 +1,10 @@
 package it.unibo.systemstate;
 
 public class Position {
-
+	
 	private int x;
 	private int y;
-
+	
 	public Position() {
 		super();
 		this.x = -1;
@@ -32,5 +32,5 @@ public class Position {
 	public void setY(int y) {
 		this.y = y;
 	}
-
+	
 }

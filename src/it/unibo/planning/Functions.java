@@ -27,22 +27,13 @@ public class Functions implements ActionsFunction, ResultFunction, StepCostFunct
 		RobotState state = (RobotState) arg0;
 		RobotAction action = (RobotAction) arg1;
 		RobotState result;
-
-		switch (action.getAction()) {
-		case RobotAction.FORWARD:
-			result = state.forward();
-			break;
-		case RobotAction.BACKWARD:
-			result = state.backward();
-			break;
-		case RobotAction.TURNLEFT:
-			result = state.turnLeft();
-			break;
-		case RobotAction.TURNRIGHT:
-			result = state.turnRight();
-			break;
-		default:
-			throw new IllegalArgumentException("Not a valid RobotAction");
+		
+		switch(action.getAction()) {
+		case RobotAction.FORWARD:   result = state.forward(); break;
+		case RobotAction.BACKWARD:  result = state.backward(); break;
+		case RobotAction.TURNLEFT:  result = state.turnLeft(); break;
+		case RobotAction.TURNRIGHT: result = state.turnRight(); break;
+		default: throw new IllegalArgumentException("Not a valid RobotAction");
 		}
 		return result;
 	}
@@ -51,21 +42,21 @@ public class Functions implements ActionsFunction, ResultFunction, StepCostFunct
 	public Set<Action> actions(Object arg0) {
 		RobotState state = (RobotState) arg0;
 		Set<Action> result = new HashSet<>();
-
+		
 		result.add(new RobotAction(RobotAction.TURNLEFT));
 		result.add(new RobotAction(RobotAction.TURNRIGHT));
-
+		
 		if (RoomMap.getRoomMap().canMove(state.getX(), state.getY(), state.getDirection()))
 			result.add(new RobotAction(RobotAction.FORWARD));
-
+		
 		return result;
 	}
 
 	@Override
 	public boolean isGoalState(Object arg0) {
 		RobotState state = (RobotState) arg0;
-		if (RoomMap.getRoomMap().isDirty(state.getX(), state.getY())
-				&& !RoomMap.getRoomMap().isObstacle(state.getX(), state.getY()))
+		if (RoomMap.getRoomMap().isDirty(state.getX(), state.getY()) &&
+				!RoomMap.getRoomMap().isObstacle(state.getX(), state.getY()))
 			return true;
 		else
 			return false;

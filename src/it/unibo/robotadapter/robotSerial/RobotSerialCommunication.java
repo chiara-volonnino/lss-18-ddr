@@ -64,7 +64,7 @@ public class RobotSerialCommunication {
 					while (true) {
 						try {
 							curDataFromArduino = conn.receiveALine();
-// 	 						logger.log("mbotConnArduinoObj received:" + curDataFromArduino );
+ 	 						logger.log("mbotConnArduinoObj received:" + curDataFromArduino );
 							double v = Double.parseDouble(curDataFromArduino);
 							// handle too fast change
 							double delta = Math.abs(v - dataSonar);

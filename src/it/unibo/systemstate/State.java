@@ -1,11 +1,11 @@
 package it.unibo.systemstate;
 
 public class State {
-
+	
 	private String name;
 	private String message;
 	private Action[] actions;
-
+	
 	public State() {
 		super();
 		this.name = null;
@@ -43,5 +43,5 @@ public class State {
 	public void setActions(Action[] actions) {
 		this.actions = actions;
 	}
-
+	
 }

@@ -1,11 +1,11 @@
 package it.unibo.systemstate;
 
 public class RobotState {
-
+	
 	private Position position;
 	private String direction;
 	private String info;
-
+	
 	public RobotState() {
 		super();
 		this.position = null;
@@ -43,5 +43,5 @@ public class RobotState {
 	public void setInfo(String info) {
 		this.info = info;
 	}
-
+	
 }

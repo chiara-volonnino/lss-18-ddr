@@ -1,18 +1,18 @@
 package it.unibo.systemstate;
 
 public class SystemState {
-
+	
 	private WorldState world;
 	private RobotState robot;
 	private State state;
-
+	
 	public SystemState() {
 		super();
 		this.world = null;
 		this.robot = null;
 		this.state = null;
 	}
-
+	
 	public SystemState(WorldState world, RobotState robot, State state) {
 		super();
 		this.world = world;
@@ -43,5 +43,5 @@ public class SystemState {
 	public void setState(State state) {
 		this.state = state;
 	}
-
+	
 }
