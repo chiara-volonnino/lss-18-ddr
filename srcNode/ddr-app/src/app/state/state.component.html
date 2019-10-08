@@ -1,7 +1,10 @@
 <p><b>Robot current state: {{state.name}}</b></p> <br>
 <div *ngIf="state.message != undefined">
-  <img *ngIf="messageIsPicture()" [src]="'data:image/jpg;base64,'+parseMessageAsPicture()"
-    data-err-src="images/png/avatar.png" class="col-md-12"/>
+    <mat-card class="col-md-6">
+      <img *ngIf="messageIsPicture()" [src]="'data:image/jpg;base64,'+parseMessageAsPicture()"
+        data-err-src="images/png/avatar.png" class="col-md-12"/>
+    </mat-card>
+    <br>
   <div *ngIf="messageIsText()" class="{{getMessageColorClass()}}">{{state.message}}</div>
 </div>
 <button mat-stroked-button *ngFor="let action of state.actions"

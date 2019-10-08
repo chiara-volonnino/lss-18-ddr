@@ -719,9 +719,9 @@ QActor console context ctxConsole {
 	
 	State storeEnvironment resumeLastPlan [
 		onEvent environment: environment(notok) ->
-			selfMsg stateUpdate: state(messageDanger, "Environment adverse - temperature too hot!");
+			selfMsg stateUpdate: state(messageDanger, "Environment condition NOT ok!");
 		onEvent environment: environment(ok) ->
-			selfMsg stateUpdate: state(messageInfo, "Environment condition is safe.")
+			selfMsg stateUpdate: state(messageInfo, "Environment condition are OK.")
 	]
 	
 	State handlePhoto [
