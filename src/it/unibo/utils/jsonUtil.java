@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 public class jsonUtil {
 
 	public static final String PREFIX = "string";
-	
+
 	public static <T> String encode(T obj) {
 		try {
 			final Gson gson = new Gson();
@@ -19,24 +19,22 @@ public class jsonUtil {
 			return e.getMessage();
 		}
 	}
-	
+
 	public static <T> T decode(String encoded, Class<T> classOfT) {
 		try {
 			final Gson gson = new Gson();
-			String json = new String(
-					Base64.getDecoder().decode(encoded),
-					"UTF-8");
+			String json = new String(Base64.getDecoder().decode(encoded), "UTF-8");
 			return gson.fromJson(json, classOfT);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
-	
+
 	public static <T> String encodeForProlog(T obj) {
 		return PREFIX + encode(obj);
 	}
-	
+
 	public static <T> T decodeFromProlog(String encoded, Class<T> classOfT) {
 		String prejson = encoded.substring(PREFIX.length());
 		return decode(prejson, classOfT);

@@ -16,13 +16,18 @@ import alice.tuprolog.Term;
 import it.unibo.qactors.QActorUtils;
 import it.unibo.qactors.akka.QActor;
 
+/**
+ * 
+ * @author Eugenio Pierfederici, Daniele Schiavi
+ *
+ */
 public class mqttUtil {
 
-//	private static final String BROKER = "tcp://broker.hivemq.com:1883";
-	private static final String BROKER = "tcp://192.168.137.2:1883";
+	private static final String BROKER = "tcp://broker.hivemq.com:1883";
+//	private static final String BROKER = "tcp://192.168.1.8:1883";
 
 	private static HashMap<String, MqttClient> connections = new HashMap<>();
-	
+
 	private static void connect(QActor qa) {
 		MemoryPersistence persistence = new MemoryPersistence();
 		try {
@@ -37,7 +42,7 @@ public class mqttUtil {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private static void subscribe(QActor qa, String topic) {
 		try {
 			MqttClient sampleClient = connections.get(qa.getName());

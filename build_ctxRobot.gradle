@@ -62,13 +62,13 @@ BASIC SUPPORT (test, akka)
      
 /*
 UNIBO SUPPORTS
-*/		
-	  compile fileTree(dir: '../it.unibo.libs2018/libs/unibo', include: 'uniboInterfaces.jar')
-	  compile fileTree(dir: '../it.unibo.libs2018/libs/unibo', include: 'unibonoawtsupports.jar')
-	  compile fileTree(dir: '../it.unibo.libs2018/libs/unibo', include: 'uniboEnvBaseAwt.jar')
-	  compile fileTree(dir: '../it.unibo.libs2018/libs/unibo', include: '2p301.jar')
-	  compile fileTree(dir: '../it.unibo.libs2018/libs/unibo', include: 'qa18Akka.jar')
-	  compile fileTree(dir: '../it.unibo.libs2018/libs/http',  include: 'nanoHTTPD.jar')
+*/	
+	  compile fileTree(dir: '../libs/unibo', include: 'uniboInterfaces.jar')
+	  compile fileTree(dir: '../libs/unibo', include: 'unibonoawtsupports.jar')
+	  compile fileTree(dir: '../libs/unibo', include: 'uniboEnvBaseAwt.jar')
+	  compile fileTree(dir: '../libs/unibo', include: '2p301.jar')
+	  compile fileTree(dir: '../libs/unibo', include: 'qa18Akka.jar')
+	  compile fileTree(dir: '../libs/http',  include: 'nanoHTTPD.jar')
 
 /*
 ADDED by the application designer for mindAI (planner)

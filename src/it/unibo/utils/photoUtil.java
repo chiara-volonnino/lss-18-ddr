@@ -49,10 +49,10 @@ public class photoUtil {
 	}
 
 	public static void storePhoto(QActor qa, String picture) {
-		saveBytes("bombs/bomb.jpg", Base64.getDecoder().decode(picture.substring(1,  picture.length()-1)));
+		saveBytes("bombs/bomb.jpg", Base64.getDecoder().decode(picture.substring(1, picture.length() - 1)));
 		saveBytes("bombs/bomb.txt", new Gson().toJson(systemStateUtil.getSystemState()).getBytes());
 	}
-	
+
 	private static void saveBytes(String fileName, byte[] object) {
 		File file = new File(fileName);
 		FileOutputStream fos = null;

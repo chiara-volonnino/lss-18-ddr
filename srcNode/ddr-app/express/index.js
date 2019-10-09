@@ -31,7 +31,7 @@ exports.config = function () {
   app.post('/environment/temperature', function (req, res) {
     console.log("Received post with value " + req.body);
     msg = qaUtils.QAmessageBuild("temperature", req.body);
-    console.log("------------EXPRESS - MQTT emitting: " + msg);
+    console.log("MQTT emitting: " + msg);
     mqtt.publishEnvironment(msg);
     res.end();
   });
@@ -41,7 +41,6 @@ exports.launch = function(port = config.default_port) {
   const server = http.createServer(app);
 
   server.listen(port, () => {
-    console.log('Running on port ' + port + ' ...');
-    console.log('EXPRESS - Waiting for client to connect to web-socket ...');
+    console.log('Server running on port ' + port + ' ...');
   });
 }

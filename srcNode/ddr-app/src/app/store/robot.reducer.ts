@@ -4,11 +4,11 @@ import { SystemState } from './robot.state';
 
 export const initialState: SystemState = {
   world: {
-    temperature: '20',
+    temperature: '15',
     map: [
-      ['r', '1', 'x'],
+      ['r', '1', 'b'],
       ['1', '1', '0'],
-      ['1', '0', 'b'],
+      ['1', '1', 'x'],
     ],
   },
   robot: {

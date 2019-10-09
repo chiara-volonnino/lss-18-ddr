@@ -1,19 +1,13 @@
 const portNumber = readPortNumberFromArguments();
 
-// Express configuration
 const server = require('./express/index');
 server.config();
 
-// Angular renderer
-server.app.use(server.express.static(__dirname + '/dist/robot-frontend'));
+server.app.use(server.express.static(__dirname + '/dist/ddr-app'));
 server.app.get('/*', (req, res) => res.sendFile(server.path.join(__dirname)));
 
-// Server launch
 server.launch(portNumber);
 
-// ------------------------------------------------------
-// Other support methods
-// ------------------------------------------------------
 function readPortNumberFromArguments() {
   const port = Number(process.argv[2])
   
