@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <SoftwareSerial.h>
-#include "L298N.h"       // Motor H-bridge (L298N)
 
 #include "Scheduler.h"
 #include "DistanceTask.h"
@@ -10,8 +9,16 @@
 
 #define PROXIMITY_TRIG_PIN A5
 #define PROXIMITY_ECHO_PIN A4
-#define LED_PIN1 13
-#define LED_PIN2 10
+#define LED_PIN    13
+
+
+#define ENA 5
+#define ENB 6
+#define IN1 7
+#define IN2 8
+#define IN3 9
+#define IN4 11
+#define carSpeed 250
 
 /*
    -----------------------------------
@@ -25,56 +32,15 @@ void move(int direction);
    Hardware devices
    -----------------------------------
 */
-#define ENA 5
-#define ENB 6
-#define IN1 7
-#define IN2 8
-#define IN3 9
-#define IN4 11
-
-#define carSpeed 250
-
-L298N motor1(7, 8);
-L298N motor2(9, 11);
-
 Scheduler sched;
 
 float* gloDistanceValue = new float(5.0);
 bool* gloBlinkingState = new bool(false);
 
 DistanceTask* distanceTask = new DistanceTask(PROXIMITY_TRIG_PIN, PROXIMITY_ECHO_PIN, gloDistanceValue);
-BlinkTask* blinkingLed1 = new BlinkTask(LED_PIN1, gloBlinkingState);
-BlinkTask* blinkingLed2 = new BlinkTask(LED_PIN2, gloBlinkingState);
+BlinkTask* blinkingLed = new BlinkTask(LED_PIN, gloBlinkingState);
 SerialTask* serialTask = new SerialTask(gloDistanceValue, gloBlinkingState, move);
 
-/*
-   -----------------------------------
-   setup
-   -----------------------------------
-*/
-void setup() {
-  sched.init(50);
-  
-  distanceTask->init(100);
-  blinkingLed1->init(200);
-  blinkingLed2->init(200);
-  serialTask->init(50);
-  
-  sched.addTask(distanceTask);
-  sched.addTask(blinkingLed1);
-  sched.addTask(blinkingLed2);
-  sched.addTask(serialTask);
-}
-
-void loop() {
-  sched.schedule();
-}
-
-/*
-   -----------------------------------
-   Moving
-   -----------------------------------
-*/
 
 void forward(){ 
   analogWrite(ENA, carSpeed);
@@ -86,7 +52,7 @@ void forward(){
   Serial.println("Forward");
 }
 
-void backward() {
+void back() {
   analogWrite(ENA, carSpeed);
   analogWrite(ENB, carSpeed);
   digitalWrite(IN1, LOW);
@@ -120,7 +86,31 @@ void stop() {
   digitalWrite(ENA, LOW);
   digitalWrite(ENB, LOW);
   Serial.println("Stop!");
-} 
+}
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(IN1,OUTPUT);
+  pinMode(IN2,OUTPUT);
+  pinMode(IN3,OUTPUT);
+  pinMode(IN4,OUTPUT);
+  pinMode(ENA,OUTPUT);
+  pinMode(ENB,OUTPUT);
+  stop();
+  sched.init(50);
+  
+  distanceTask->init(100);
+  blinkingLed->init(200);
+  serialTask->init(50);
+  
+  sched.addTask(distanceTask);
+  sched.addTask(blinkingLed);
+  sched.addTask(serialTask);
+}
+
+void loop() {
+  sched.schedule();
+}
 
 void move(int direction)
 {
@@ -130,7 +120,7 @@ void move(int direction)
       forward();
       break;
     case 2: //backward
-      backward();
+      back();
       break;
     case 3: //left
       left();
