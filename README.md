@@ -12,13 +12,13 @@ In order to use this application, download and install:
 ## Run
 
 ### Front-end
-* ddr-app read: https://bitbucket.org/chiara-volonnino/iss-18-ddr/src/master/srcNode/ddr-app/
+* Read ddr-app: https://bitbucket.org/chiara-volonnino/iss-18-ddr/src/master/srcNode/ddr-app/
 
 ### Robot virtual:
-* Soffritti read: https://bitbucket.org/chiara-volonnino/iss-18-ddr/src/master/srcNode/Soffritti/
+* Read Soffritti: https://bitbucket.org/chiara-volonnino/iss-18-ddr/src/master/srcNode/Soffritti/
 
 ### Robot Phisical: 
-* Go and load in Arduino this file: https://bitbucket.org/chiara-volonnino/iss-18-ddr/src/master/srcArduino/ArduinoCar/
+* Go and load in your Arduino this files: https://bitbucket.org/chiara-volonnino/iss-18-ddr/src/master/srcArduino/ArduinoCar/
 
 ### Robot and Console
 
