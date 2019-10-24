@@ -48,8 +48,8 @@ public class robotExecutor implements RobotExecutor {
 
 	private void startSoffritti(QActor qa) throws Exception {
 		qa.println("starting server...");
-		//process = Runtime.getRuntime().exec("./startServer.bat", null, new File("srcNode/Soffritti"));
-		process = Runtime.getRuntime().exec("cmd /c startServer.bat", null, new File("srcNode\\Soffritti"));
+		process = Runtime.getRuntime().exec("./startServer.bat", null, new File("srcNode/Soffritti"));
+		//process = Runtime.getRuntime().exec("cmd /c startServer.bat", null, new File("srcNode\\Soffritti"));
 		new Thread() {
 			@Override
 			public void run() {
