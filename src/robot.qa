@@ -92,16 +92,16 @@ Event frontendRobotState: frontendRobotState(X)										//from CONSOLE to GUI; 
  * Host for distributed simulation
  *----------------------------------------------------------------------------
  */
-//Context ctxConsole ip [ host="0.0.0.0" port=8078 ]
-//Context ctxRobot ip [ host="192.168.137.2" port=8079 ]
+Context ctxConsole ip [ host="192.168.137.1" port=8078 ]
+Context ctxRobot ip [ host="192.168.137.2" port=8079 ]
 
 /* 
  * ---------------------------------------------------------------------------
  * Host for virtual simulation
  *----------------------------------------------------------------------------
  */
-Context ctxConsole ip [ host="localhost" port=8078 ]
-Context ctxRobot ip [ host="localhost" port=8079 ]
+//Context ctxConsole ip [ host="localhost" port=8078 ]
+//Context ctxRobot ip [ host="localhost" port=8079 ]
 
 // Handler sonar virtuale
 EventHandler collisionevh for robotSonarObstacle -print  {   
@@ -144,7 +144,7 @@ QActor robot_adapter context ctxRobot {
 
 	Rules {
 		robotType("robotSerial", setuparg("/dev/ttyACM0")).
-		robotType("robotVirtual", setuparg("localhost,true")).
+//		robotType("robotVirtual", setuparg("localhost,true")).
 //		robotType("robotVirtual", setuparg("localhost,false")).
 //		robotType("robotDemo", setuparg("")).
 	}

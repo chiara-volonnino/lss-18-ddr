@@ -24,13 +24,13 @@ void SerialTask::remoteCmdExecutor()
     input = Serial.read();
     //Serial.println(input);
     switch ( input ) {
-      case 119 : move(1); break;  //w
-      case 115 : move(2); break;  //s
-      case 97  : move(3); break;  //a
-      case 100 : move(4); break;  //d
-      case 104 : move(5); break;  //h
-      case 98 : *gloBlinkingState=true; break;   //b
-      case 110 : *gloBlinkingState=false; break; //n
+      case 'w' : move(1); break;  //w
+      case 's' : move(2); break;  //s
+      case 'a'  : move(3); break;  //a
+      case 'd' : move(4); break;  //d
+      case 'h' : move(5); break;  //h
+      case 'b' : *gloBlinkingState=true; break;   //b
+      case 'n' : *gloBlinkingState=false; break; //n
       default  : move(5);
     }
   }
