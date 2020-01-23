@@ -1,5 +1,5 @@
 # ISS-18-ddr
-Project for the course of "Laboratorio dei Sistemi Software" AA.2018/2019
+Project for the course of "Laboratory of Software Systems" AA.2018/2019
 
 https://www.unibo.it/en/teaching/course-unit-catalogue/course-unit/2019/412677
 
