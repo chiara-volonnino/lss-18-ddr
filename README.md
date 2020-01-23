@@ -12,13 +12,14 @@ In order to use this application, download and install:
 ## Run
 
 ### Front-end
-* Read ddr-app: https://bitbucket.org/chiara-volonnino/iss-18-ddr/src/master/srcNode/ddr-app/
+* Read ddr-app: https://github.com/chiara-volonnino/lss-18-ddr/tree/master/srcNode/ddr-app
 
 ### Robot virtual:
-* Read Soffritti: https://bitbucket.org/chiara-volonnino/iss-18-ddr/src/master/srcNode/Soffritti/
+* Read Soffritti: https://github.com/chiara-volonnino/lss-18-ddr/tree/master/srcNode/Soffritti
 
 ### Robot Phisical: 
-* Go and load in your Arduino this files: https://bitbucket.org/chiara-volonnino/iss-18-ddr/src/master/srcArduino/ArduinoCar/
+* Go and load in your Arduino this files: https://github.com/chiara-volonnino/lss-18-ddr/tree/master/srcArduino/ArduinoCar
+* Build project and load in your Raspberry jar file present in path: build -> distributions -> it.unibo.ctxConsoleMainCtxConsole and build -> distributions -> it.unibo.ctxRobotMainCtxRobot 
 
 ### Robot and Console
 
@@ -44,9 +45,8 @@ In ***remote*** the system all that is needed:
 	java -jar iss-18-ddr-1.0.jar
 `
 
-## Documentation
-A brief presentation of the system can be found in doc folder or in downloads: 
-https://bitbucket.org/chiara-volonnino/iss-18-ddr/downloads/
+## Documentation [ITA]
+A brief presentation of the system can be found in [doc folder](https://github.com/chiara-volonnino/lss-18-ddr/tree/master/doc)
 
 ## Team members
 Chiara Volonnino (chiara.volonnino@studio.unibo.it)  
