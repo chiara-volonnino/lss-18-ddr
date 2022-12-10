@@ -26,7 +26,7 @@
     "@ngrx/store-devtools": "^7.2.0",
     "bootstrap": "^4.3.0",
     "core-js": "^2.5.4",
-    "express": "^4.16.4",
+    "express": "^4.18.2",
     "mqtt": "^2.18.8",
     "rxjs": "~6.3.3",
     "rxjs-compat": "^6.4.0",
